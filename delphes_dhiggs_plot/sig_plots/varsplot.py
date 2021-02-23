@@ -1,10 +1,10 @@
 import ROOT
 from ROOT import TFile, gROOT, TCanvas, gSystem
 import numpy as np
-gSystem.Load("../libDelphes.so")
+gSystem.Load("../../libDelphes.so")
 
 print "...import signal and background file"
-input_sig = "../delphes_dhiggs_sig.root"
+input_sig = "../../delphes_dhiggs_sig.root"
 file_sig = ROOT.TFile(input_sig)
 tree_sig = ROOT.gROOT.FindObject("Delphes")
 myCanvas = TCanvas()
