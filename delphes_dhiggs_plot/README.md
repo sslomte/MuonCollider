@@ -71,7 +71,7 @@ then you could compile
 ```bash
 make -j 8
 ```
-However if you are on lxplus.cern.ch, you could simplify:
+However if you are on lxplus.cern.ch, you could simply run:
 ```bash
 source  /afs/cern.ch/sw/lcg/external/gcc/4.9.3/x86_64-slc6/setup.sh
 source /afs/cern.ch/sw/lcg/app/releases/ROOT/6.06.00/x86_64-slc6-gcc49-opt/root/bin/thisroot.sh
