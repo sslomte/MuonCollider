@@ -37,7 +37,7 @@ set ebeam2 1500.
 set nevents 1000
 set iseed 1823211
 ```
-The process will take about 5-60 min, suggest working on vncserver or add following commnad to ssh config:
+The process will take about 5-60 min, suggest working on vncserver or add following command to ssh config:
 ```config
     ServerAliveInterval 240
     ServerAliveCountMax 2
@@ -102,4 +102,10 @@ git clone https://github.com/Kenny-Jia/MuonCollider/tree/main/delphes_dhiggs_plo
 cd <bkgs or sig>_plots
 pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
 python varsplot.py
+```
+### Event Display
+```bash
+pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
+cd Delphes
+root -l examples/EventDisplay.C\(\"cards/delphes_card_MuonColliderDet.tcl\"\,\"delphes_dhiggs_sig.root\"\)
 ```
