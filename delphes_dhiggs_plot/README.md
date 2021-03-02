@@ -69,6 +69,7 @@ CXXFLAGS += -I$(CMSSW_BASE)/src
 ```
 then you could compile
 ```bash
+pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
 make -j 8
 ```
 However if you are on lxplus.cern.ch, you could simply run:
