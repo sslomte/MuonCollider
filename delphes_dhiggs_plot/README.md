@@ -104,6 +104,12 @@ pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
 python varsplot.py
 ```
 ### Event Display
+Firstly compile the display library
+```bash
+cd Delphes/
+make display
+```
+Then we could call the event display macro:
 ```bash
 pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
 cd Delphes
