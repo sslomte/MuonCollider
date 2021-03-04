@@ -1,3 +1,4 @@
+//usage: root -l JetsMerge.C\(\"inputfile.root\"\,\"outputfile.root\"\)
 #ifdef __CLING__
 R__LOAD_LIBRARY(libDelphes)
 #include "classes/DelphesClasses.h"
@@ -21,13 +22,13 @@ R__LOAD_LIBRARY(libDelphes)
 #include <TCanvas.h>
 #include <TMath.h>
 
-void JetsMerge(const char *inputFile){
+void JetsMerge(const char *inputFile, const char *outputFile){
      gSystem->Load("libDelphes.so");
      TChain chain("Delphes");
      chain.Add(inputFile);
      ExRootTreeReader *treeReader = new ExRootTreeReader(&chain);
      TFile *file_sig = new TFile(inputFile);
-     TFile *output = new TFile("delphes_dhiggs_sig_matchjets.root", "recreate");
+     TFile *output = new TFile(outputFile, "recreate");
      TTree *tree_sig = (TTree*)file_sig->Get("Delphes");
      TTree *tree_output = new TTree("tree_output","Delphes");
      TBranch *KTjet = tree_sig->GetBranch("KTjet");
@@ -133,6 +134,8 @@ void JetsMerge(const char *inputFile){
 	 tree_output->Fill();
      }
      tree_output->Write();
+     tree_output->Draw("KTGeneta:KTGenphi");
+     tree_output->Draw("VLCR05N4Geneta:VLCR05N4Genphi");
      output->Close();
      file_sig->Close();
 }
