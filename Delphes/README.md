@@ -97,12 +97,10 @@ Then you are ready to run simulation for your events!
 ```bash
 ./DelphesHepMC cards/delphes_card_MuonColliderDet.tcl <name for output root file>.root ~/MG5_aMC_v2_7_2/<your output directory>/Events/run_01/tag_1_pythia8_events.hepmc
 ```
-### plots making (still developing)
+### simple variable plots
+Some simple variable plots are already made
 ```bash
-git clone https://github.com/Kenny-Jia/MuonCollider/tree/main/delphes_dhiggs_plot.git
-cd <bkgs or sig>_plots
-pushd /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_1_6; cmsenv;popd
-python varsplot.py
+git clone https://github.com/Kenny-Jia/MuonCollider/tree/main/Delphes/delphes_dhiggs.git
 ```
 ### Event Display
 Firstly compile the display library
