@@ -25,9 +25,9 @@ R__LOAD_LIBRARY(libDelphes)
 
 void AnalyzeM(const char *inputFile, const char *outputFile){
      gSystem->Load("libDelphes.so");
-     TChain chain("Delphes");
-     chain.Add(inputFile);
-     ExRootTreeReader *treeReader = new ExRootTreeReader(&chain);
+     //TChain chain("Delphes");
+     //chain.Add(inputFile);
+     //ExRootTreeReader *treeReader = new ExRootTreeReader(&chain);
      TFile *file_sig = new TFile(inputFile);
      TFile *output = new TFile(outputFile, "recreate");
      TTree *tree_sig = (TTree*)file_sig->Get("Delphes");
@@ -53,8 +53,6 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      Double_t VLC2pt;
      Double_t VLC2mass;
      Double_t VLCR05N4pairmass;
-     Double_t VLCR05N4pair1Mass = 0;
-     Double_t VLCR05N4pair2Mass = 0;
      Int_t pair1jet1entry;
      Int_t pair1jet2entry;
      Int_t pair2jet1entry;
@@ -71,7 +69,8 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 VLCjetR05N4_phi->GetBranch()->GetEntry(entry);
 	 VLCjetR05N4_pt->GetBranch()->GetEntry(entry);
 	 VLCjetR05N4_mass->GetBranch()->GetEntry(entry);
-	 
+	 Double_t VLCR05N4pair1Mass = 0;
+
 	 for(Int_t vlc1entry=0; vlc1entry < nVLCjet; vlc1entry++){
 	     for(Int_t vlc2entry=vlc1entry+1; vlc2entry < nVLCjet; vlc2entry++){
 		 VLC1eta = VLCjetR05N4_eta->GetValue(vlc1entry);
@@ -82,6 +81,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
          	 VLC2phi = VLCjetR05N4_phi->GetValue(vlc2entry);
          	 VLC2pt = VLCjetR05N4_pt->GetValue(vlc2entry);
          	 VLC2mass = VLCjetR05N4_mass->GetValue(vlc2entry);
+		 VLCR05N4pairmass = 0;
 
                  TLorentzVector h1;
                  TLorentzVector jet1;
@@ -91,6 +91,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 		 h1=jet1+jet2;
 		 VLCR05N4pairmass = h1.Mag();
                  //VLCR05N4pairmass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
+		 
 		 if(abs(125 - VLCR05N4pairmass) < abs(125 -VLCR05N4pair1Mass)){
 		     VLCR05N4pair1Mass = VLCR05N4pairmass;
 		     pair1jet1entry = vlc1entry;
@@ -119,6 +120,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
          VLC2pt = VLCjetR05N4_pt->GetValue(pair2jet2entry);
          VLC2mass = VLCjetR05N4_mass->GetValue(pair2jet2entry);
 
+         Double_t VLCR05N4pair2Mass = 0;
          TLorentzVector h2;
          TLorentzVector jet1;
          TLorentzVector jet2;
