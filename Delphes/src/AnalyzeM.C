@@ -45,8 +45,8 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 
      Int_t nEntries = tree_sig->GetEntries();
 
-     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 50 , 0, 300); 
-     TH1D *VLCR05N4Mass2 = new TH1D("VLCR05N4Mass2", "VLCR05N4Mass2", 50 , 0, 500); 
+     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 100 , 0, 1000); 
+     TH1D *VLCR05N4Mass2 = new TH1D("VLCR05N4Mass2", "VLCR05N4Mass2", 100 , 0, 1000); 
 
      Double_t VLC1eta;
      Double_t VLC1phi;
@@ -179,6 +179,8 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 h2=jet1+jet2;
 	 VLCR05N4pair2Mass = h2.Mag();
          //VLCR05N4pair2Mass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
+     //VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
+     //VLCR05N4Mass2->Fill(VLCR05N4pair2Mass);
 	 
          if(VLC1flag==true and VLC2flag==true){
 	     VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
@@ -191,13 +193,9 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      TF1 *jetpair2gausfit = new TF1("jetpair2gausfit", "gaus",0,300);
      
      TCanvas *mycanvas = new TCanvas("mycanvas","My Canvas",200,10,600,480);
-     //VLCR05N4Mass1->Draw();
      VLCR05N4Mass1->Fit("jetpair1gausfit");
-
      mycanvas->SaveAs("VLCR05N4pair1Mass.png");
-     //VLCR05N4Mass2->Draw();
      VLCR05N4Mass2->Fit("jetpair2gausfit");
-
      mycanvas->SaveAs("VLCR05N4pair2Mass.png");
      VLCR05N4Mass1->Write();
      VLCR05N4Mass2->Write();
