@@ -102,7 +102,6 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 		 jet2.SetPtEtaPhiM(VLC2pt, VLC2eta, VLC2phi,VLC1mass);
 		 h1=jet1+jet2;
 		 VLCR05N4pairmass = h1.Mag();
-                 //VLCR05N4pairmass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
 		 
 		 if(abs(125 - VLCR05N4pairmass) < abs(125 -VLCR05N4pair1Mass)){
 		     VLCR05N4pair1Mass = VLCR05N4pairmass;
@@ -143,13 +142,13 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
   	     Gen1eta = GenJet_eta->GetValue(gen1entry);
 	     Gen1phi = GenJet_phi->GetValue(gen1entry);
 	     Float_t jet1DeltaRtmp = TMath::Sqrt(pow((VLC1eta-Gen1eta),2)+pow((VLC1phi-Gen1phi),2));
-	     //cout << jet1DeltaRtmp << "|";
 	     if(jet1DeltaRtmp < jet1DeltaR){
 	         jet1DeltaR = jet1DeltaRtmp;
 		 jet1entry = gen1entry;
-		 if (jet1DeltaR < 0.25){
-		     VLC1flag = true;
-	             //cout << "the first jet in the "<<entry<< "th event pass the check."<<endl;	 
+		 if (jet1DeltaR < 0.5){
+		     if (abs(Gen1eta) < 2.25){
+		         VLC1flag = true;
+		     }
 		 }
 	     }  
          }
@@ -161,10 +160,10 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
                  if(jet2DeltaRtmp < jet2DeltaR){
 	             jet2DeltaR = jet2DeltaRtmp;
 		     Int_t jet2entry = gen2entry;
-                     if (jet2DeltaR < 0.25){
-		         VLC2flag = true;
-	                 //cout << "the second jet in the "<<entry<< "th event pass the check."<<endl;	 
-			   
+                     if (jet2DeltaR < 0.5){
+		         if (abs(Gen2eta) < 2.25){
+		             VLC2flag = true;
+			 }
 		     }
 	         }
 	     }
@@ -178,9 +177,6 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 jet2.SetPtEtaPhiM(VLC2pt, VLC2eta, VLC2phi,VLC1mass);
 	 h2=jet1+jet2;
 	 VLCR05N4pair2Mass = h2.Mag();
-         //VLCR05N4pair2Mass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
-     //VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
-     //VLCR05N4Mass2->Fill(VLCR05N4pair2Mass);
 	 
          if(VLC1flag==true and VLC2flag==true){
 	     VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
