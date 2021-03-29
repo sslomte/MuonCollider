@@ -42,11 +42,15 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      TLeaf *GenJet_size = tree_sig->GetLeaf("GenJet_size");
      TLeaf *GenJet_eta = tree_sig->GetLeaf("GenJet.Eta");
      TLeaf *GenJet_phi = tree_sig->GetLeaf("GenJet.Phi");
+     TLeaf *GenJet_pt = tree_sig->GetLeaf("GenJet.PT");
+     TLeaf *GenJet_mass = tree_sig->GetLeaf("GenJet.Mass");
 
      Int_t nEntries = tree_sig->GetEntries();
 
-     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 100 , 0, 500); 
-     TH1D *VLCR05N4Mass2 = new TH1D("VLCR05N4Mass2", "VLCR05N4Mass2", 100 , 0, 500); 
+     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 100 , 0, 1000); 
+     TH1D *VLCR05N4Mass2 = new TH1D("VLCR05N4Mass2", "VLCR05N4Mass2", 100 , 0, 1000); 
+     TH1D *GenMass2 = new TH1D("GenMass2", "GenMass2", 100 , 0, 1000); 
+     TH1D *VLCGenMass2Comp = new TH1D("VLCGenMass2Comp", "VLCGenMass2Comp", 100 , -3, 3); 
 
      Double_t VLC1eta;
      Double_t VLC1phi;
@@ -61,13 +65,16 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      Double_t Gen1phi;
      Double_t Gen2eta;
      Double_t Gen2phi;
+     Double_t Gen1pt;
+     Double_t Gen2pt;
+     Double_t Gen1mass;
+     Double_t Gen2mass;
 
      Int_t pair1jet1entry;
      Int_t pair1jet2entry;
      Int_t pair2jet1entry;
      Int_t pair2jet2entry;
 
-     cout << "start";
      for(Long64_t entry=0; entry < nEntries; entry++){
 	 tree_sig->GetEntry(entry);
 	 tree_output->GetEntry(entry);
@@ -80,6 +87,12 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 VLCjetR05N4_phi->GetBranch()->GetEntry(entry);
 	 VLCjetR05N4_pt->GetBranch()->GetEntry(entry);
 	 VLCjetR05N4_mass->GetBranch()->GetEntry(entry);
+
+	 GenJet_eta->GetBranch()->GetEntry(entry);
+	 GenJet_phi->GetBranch()->GetEntry(entry);
+	 GenJet_pt->GetBranch()->GetEntry(entry);
+	 GenJet_mass->GetBranch()->GetEntry(entry);
+
 	 Double_t VLCR05N4pair1Mass = 0;
 	 Double_t VLCR05N4subpairmass = 0;
 
@@ -102,7 +115,6 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 		 jet2.SetPtEtaPhiM(VLC2pt, VLC2eta, VLC2phi,VLC1mass);
 		 h1=jet1+jet2;
 		 VLCR05N4pairmass = h1.Mag();
-                 //VLCR05N4pairmass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
 		 
 		 if(abs(125 - VLCR05N4pairmass) < abs(125 -VLCR05N4pair1Mass)){
 		     VLCR05N4pair1Mass = VLCR05N4pairmass;
@@ -137,19 +149,21 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 bool VLC2flag = false;
          Float_t jet1DeltaR = 100;
          Float_t jet2DeltaR = 100;
+
 	 Int_t jet1entry;
+	 Int_t jet2entry;
 
 	 for(Int_t gen1entry=0; gen1entry < nGenJet; gen1entry++){
   	     Gen1eta = GenJet_eta->GetValue(gen1entry);
 	     Gen1phi = GenJet_phi->GetValue(gen1entry);
 	     Float_t jet1DeltaRtmp = TMath::Sqrt(pow((VLC1eta-Gen1eta),2)+pow((VLC1phi-Gen1phi),2));
-	     //cout << jet1DeltaRtmp << "|";
 	     if(jet1DeltaRtmp < jet1DeltaR){
 	         jet1DeltaR = jet1DeltaRtmp;
 		 jet1entry = gen1entry;
-		 if (jet1DeltaR < 0.25){
-		     VLC1flag = true;
-	             //cout << "the first jet in the "<<entry<< "th event pass the check."<<endl;	 
+		 if (jet1DeltaR < 0.5){
+		     if (abs(Gen1eta) < 2.25){
+		         VLC1flag = true;
+		     }
 		 }
 	     }  
          }
@@ -160,11 +174,11 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	     if (gen2entry != jet1entry){
                  if(jet2DeltaRtmp < jet2DeltaR){
 	             jet2DeltaR = jet2DeltaRtmp;
-		     Int_t jet2entry = gen2entry;
-                     if (jet2DeltaR < 0.25){
-		         VLC2flag = true;
-	                 //cout << "the second jet in the "<<entry<< "th event pass the check."<<endl;	 
-			   
+		     jet2entry = gen2entry;
+                     if (jet2DeltaR < 0.5){
+		         if (abs(Gen2eta) < 2.25){
+		             VLC2flag = true;
+			 }
 		     }
 	         }
 	     }
@@ -175,33 +189,58 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
          TLorentzVector jet1;
          TLorentzVector jet2;
  	 jet1.SetPtEtaPhiM(VLC1pt, VLC1eta, VLC1phi,VLC1mass);
-	 jet2.SetPtEtaPhiM(VLC2pt, VLC2eta, VLC2phi,VLC1mass);
+	 jet2.SetPtEtaPhiM(VLC2pt, VLC2eta, VLC2phi,VLC2mass);
 	 h2=jet1+jet2;
 	 VLCR05N4pair2Mass = h2.Mag();
-         //VLCR05N4pair2Mass = TMath::Sqrt(2*VLC1pt*VLC2pt*(TMath::CosH(VLC1eta-VLC2eta)-TMath::Cos(VLC1phi-VLC2phi)));
-     //VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
-     //VLCR05N4Mass2->Fill(VLCR05N4pair2Mass);
+         
+	 
+	 Gen1eta = GenJet_eta->GetValue(jet1entry);
+         Gen1phi = GenJet_phi->GetValue(jet1entry);
+         Gen1pt = GenJet_pt->GetValue(jet1entry);
+         Gen1mass = GenJet_mass->GetValue(jet1entry);
+         Gen2eta = GenJet_eta->GetValue(jet2entry);
+         Gen2phi = GenJet_phi->GetValue(jet2entry);
+         Gen2pt = GenJet_pt->GetValue(jet2entry);
+         Gen2mass = GenJet_mass->GetValue(jet2entry);
+         
+	 Double_t GenJetMass = 0;
+         TLorentzVector Genh2;
+         TLorentzVector GenJet1;
+         TLorentzVector GenJet2;
+ 	 GenJet1.SetPtEtaPhiM(Gen1pt, Gen1eta, Gen1phi,Gen1mass);
+	 GenJet2.SetPtEtaPhiM(Gen2pt, Gen2eta, Gen2phi,Gen2mass);
+	 Genh2=GenJet1+GenJet2;
+	 GenJetMass = Genh2.Mag();
+         Double_t VLCGendiff = (VLCR05N4pair2Mass-GenJetMass)/GenJetMass;
+
+
 	 
          if(VLC1flag==true and VLC2flag==true){
 	     VLCR05N4Mass1->Fill(VLCR05N4pair1Mass);
              VLCR05N4Mass2->Fill(VLCR05N4pair2Mass);
+	     GenMass2->Fill(GenJetMass);
+	     VLCGenMass2Comp->Fill(VLCGendiff);
+
 	 } else {
 	     cout << "the second jet pair in the "<<entry<< "th event failed check."<<endl;	 
          }
      }
      TF1 *jetpair1gausfit = new TF1("jetpair1gausfit", "gaus",20,220);
-     TF1 *jetpair2gausfit = new TF1("jetpair2gausfit", "gaus",0,140);
+     TF1 *jetpair2gausfit = new TF1("jetpair2gausfit", "gaus",0,200);
      
      TCanvas *mycanvas = new TCanvas("mycanvas","My Canvas",200,10,600,480);
      VLCR05N4Mass1->Fit("jetpair1gausfit","R");
      mycanvas->SaveAs("VLCR05N4pair1Mass.png");
      VLCR05N4Mass2->Fit("jetpair2gausfit","R");
      mycanvas->SaveAs("VLCR05N4pair2Mass.png");
+     GenMass2->Fit("jetpair2gausfit","R");
+     mycanvas->SaveAs("GenMass2.png");
+
      VLCR05N4Mass1->Write();
      VLCR05N4Mass2->Write();
-
+     GenMass2->Write();
+     VLCGenMass2Comp->Write();
      tree_output->Write();
-
 
      output->Close();
      file_sig->Close();
