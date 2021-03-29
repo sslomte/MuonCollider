@@ -351,9 +351,9 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	             jet1DeltaR = jet1DeltaRtmp;
 		     jet1entry = gen1entry;
 		     if (jet1DeltaR < 0.5){
-		         if (abs(Gen1eta) < 2.25){
+		         //if (abs(Gen1eta) < 2.25){
 		             AKT1flag = true;
-		         }
+		         //}
 		     }
 	         }  
              }
@@ -366,9 +366,9 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	                 jet2DeltaR = jet2DeltaRtmp;
 		         jet2entry = gen2entry;
                          if (jet2DeltaR < 0.5){
-		             if (abs(Gen2eta) < 2.25){
+		             //if (abs(Gen2eta) < 2.25){
 		                 AKT2flag = true;
-			     }
+			     //}
 		         }
 	             }
 	         }
