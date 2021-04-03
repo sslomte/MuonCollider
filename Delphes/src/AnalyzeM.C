@@ -102,7 +102,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      Int_t pair2jet2entry;
 
      cout << "Running Pairing up Algo..." << endl;
-
+//run over event entries
      for(Long64_t entry=0; entry < nEntries; entry++){
 	 tree_sig->GetEntry(entry);
 	 tree_output->GetEntry(entry);
@@ -260,7 +260,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	 } /*else {
 	     cout << "the second jet pair in the "<<entry<< "th event failed check."<<endl;	 
          }*/
-
+//Pairing up Anti-kt jets
 	 if (nAKTjet >= 4) {
              //Pairing up leading anti-KT jet pair
 	     for(Int_t akt1entry=0; akt1entry < nAKTjet; akt1entry++){
@@ -291,7 +291,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 		     }		 	 
 	         }  
 	     }
-                          //Pairing up sub-leading anti-KT jet pair
+//Pairing up sub-leading anti-KT jet pair
 	     for(Int_t akt1entry=0; akt1entry < nAKTjet; akt1entry++){
 	         if((akt1entry!=pair1jet1entry) and (akt1entry!=pair1jet2entry)){
                      pair2jet1entry = akt1entry;
@@ -342,7 +342,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 
 	     Int_t jet1entry;
 	     Int_t jet2entry;
-             //Truth matching for anti-KT jets
+//Truth matching for anti-KT jets
 	     for(Int_t gen1entry=0; gen1entry < nGenJet; gen1entry++){
   	         Gen1eta = GenJet_eta->GetValue(gen1entry);
 	         Gen1phi = GenJet_phi->GetValue(gen1entry);
@@ -411,21 +411,18 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
          }
 	 GenUncutMass2->Fill(GenJetMass);
      }
+//Fitting and plotting
      TF1 *jetpair1fit = new TF1("jetpair1fit", "gaus",10,200);
      TF1 *jetpair2fit = new TF1("jetpair2fit", "gaus+expo(3)",20,600);
      TF1 *fSignal = new TF1("fSignal","gaus",20,600);
      TF1 *fBackground = new TF1("fBackground","expo",20,600);
      Double_t param[5];
 
-
-
      jetpair2fit->SetParameters(25,125,10,2,-0.0001);
      jetpair2fit->SetParLimits(1,60,150);
      jetpair2fit->SetParLimits(2,10,50);
      jetpair2fit->SetParLimits(3,0,8);
      jetpair2fit->SetParLimits(4,-1,-0.0001);
-
-
 	     
      TCanvas *mycanvas = new TCanvas("mycanvas","My Canvas",200,10,600,480);
      cout <<endl<< "Run gaussian fit for the leading Valencia jet pair..."<<endl;
@@ -452,7 +449,6 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
      AKTjetMass1->Fit("jetpair1fit","R");
      mycanvas->SaveAs("AKTjetpair1Mass.png");
      cout <<endl<< "Run gaussian fit for the sub-leading anti-KT jet pair..."<<endl;
-
 
      AKTjetMass2->Fit("jetpair2fit","R");
      jetpair2fit->GetParameters(param);
