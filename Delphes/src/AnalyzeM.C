@@ -55,13 +55,13 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 
      Int_t nEntries = tree_sig->GetEntries();
 
-     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 100 , 0, 300); 
+     TH1D *VLCR05N4Mass1 = new TH1D("VLCR05N4Mass1", "VLCR05N4Mass1", 100 , 0, 600); 
      TH1D *VLCR05N4Mass2 = new TH1D("VLCR05N4Mass2", "VLCR05N4Mass2", 100 , 0, 600); 
      TH1D *GenVLCMass2 = new TH1D("GenVLCMass2", "GenVLCMass2", 100 , 0, 600); 
      TH1D *VLCGenMass2Comp = new TH1D("VLCGenMass2Comp", "VLCGenMass2Comp", 100 , -1.5, 1.5); 
 
-     TH1D *AKTjetMass1 = new TH1D("AKTjetMass1", "AKTjetMass1", 100 , 0, 300); 
-     TH1D *AKTjetMass2 = new TH1D("AKTjetMass2", "AKTjetMass2", 100 , 0, 600); 
+     TH1D *AKTjetMass1 = new TH1D("AKTjetMass1", "Anti_KTjet leading jets pair invariant mass", 100 , 0, 600); 
+     TH1D *AKTjetMass2 = new TH1D("AKTjetMass2", "Anti_KTjet sub-leading jets pair invariant mass", 100 , 0, 600); 
      TH1D *GenAKTMass2 = new TH1D("GenAKTMass2", "GenAKTMass2", 100 , 0, 600); 
      TH1D *AKTGenMass2Comp = new TH1D("AKTGenMass2Comp", "AKTGenMass2Comp", 100 , -1.5, 1.5); 
      
@@ -261,7 +261,7 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	     cout << "the second jet pair in the "<<entry<< "th event failed check."<<endl;	 
          }*/
 
-	 if (nAKTjet == 4) {
+	 if (nAKTjet >= 4) {
              //Pairing up leading anti-KT jet pair
 	     for(Int_t akt1entry=0; akt1entry < nAKTjet; akt1entry++){
 	         for(Int_t akt2entry=akt1entry+1; akt2entry < nAKTjet; akt2entry++){
@@ -351,9 +351,9 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	             jet1DeltaR = jet1DeltaRtmp;
 		     jet1entry = gen1entry;
 		     if (jet1DeltaR < 0.5){
-		         //if (abs(Gen1eta) < 2.25){
+		         if (abs(Gen1eta) < 2.25){
 		             AKT1flag = true;
-		         //}
+		         }
 		     }
 	         }  
              }
@@ -366,9 +366,9 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
 	                 jet2DeltaR = jet2DeltaRtmp;
 		         jet2entry = gen2entry;
                          if (jet2DeltaR < 0.5){
-		             //if (abs(Gen2eta) < 2.25){
+		             if (abs(Gen2eta) < 2.25){
 		                 AKT2flag = true;
-			     //}
+			     }
 		         }
 	             }
 	         }
@@ -411,49 +411,85 @@ void AnalyzeM(const char *inputFile, const char *outputFile){
          }
 	 GenUncutMass2->Fill(GenJetMass);
      }
-     TF1 *jetpair1gausfit = new TF1("jetpair1gausfit", "gaus",20,220);
-     TF1 *jetpair2gausfit = new TF1("jetpair2gausfit", "gaus",0,200);
-     
+     TF1 *jetpair1fit = new TF1("jetpair1fit", "gaus",10,200);
+     TF1 *jetpair2fit = new TF1("jetpair2fit", "gaus+expo(3)",20,600);
+     TF1 *fSignal = new TF1("fSignal","gaus",20,600);
+     TF1 *fBackground = new TF1("fBackground","expo",20,600);
+     Double_t param[5];
+
+
+
+     jetpair2fit->SetParameters(25,125,10,2,-0.0001);
+     jetpair2fit->SetParLimits(1,60,150);
+     jetpair2fit->SetParLimits(2,10,50);
+     jetpair2fit->SetParLimits(3,0,8);
+     jetpair2fit->SetParLimits(4,-1,-0.0001);
+
+
+	     
      TCanvas *mycanvas = new TCanvas("mycanvas","My Canvas",200,10,600,480);
      cout <<endl<< "Run gaussian fit for the leading Valencia jet pair..."<<endl;
-     VLCR05N4Mass1->Fit("jetpair1gausfit","R");
+     VLCR05N4Mass1->Fit("jetpair1fit","R");
      mycanvas->SaveAs("VLCR05N4pair1Mass.png");
      cout <<endl<< "Run gaussian fit for the sub-leading Valencia jet pair..."<<endl;
-     VLCR05N4Mass2->Fit("jetpair2gausfit","R");
+     
+     VLCR05N4Mass2->Fit("jetpair2fit","R");
+     jetpair2fit->GetParameters(param);
+     fSignal->SetParameters(&param[0]);
+     fBackground->SetParameters(&param[3]);
+     TH1D *VLCR05N4Mass2Signal = new TH1D(*VLCR05N4Mass2);
+     VLCR05N4Mass2Signal->Sumw2();
+     VLCR05N4Mass2Signal->Add(fBackground,-1);
+     VLCR05N4Mass2->GetXaxis()->SetTitle("M [GeV]");
+     VLCR05N4Mass2->GetYaxis()->SetTitle("Events");
+     VLCR05N4Mass2->Draw();fBackground->SetLineColor(4);fBackground->Draw("SAME"); 
+     //VLCR05N4Mass2Signal->Draw("SAME"); fSignal->Draw("SAME");
      mycanvas->SaveAs("VLCR05N4pair2Mass.png");
      cout <<endl<< "Run gaussian fit for the sub-leading GenJet pair under selection of VLC..."<<endl;
-     GenVLCMass2->Fit("jetpair2gausfit","R");
-     mycanvas->SaveAs("GenVLCMass2.png");
+     //GenVLCMass2->Fit("jetpair2fit","R");
+     //mycanvas->SaveAs("GenVLCMass2.png");
      cout <<endl<< "Run gaussian fit for the leading anti-KT jet pair..."<<endl;
-     AKTjetMass1->Fit("jetpair1gausfit","R");
+     AKTjetMass1->Fit("jetpair1fit","R");
      mycanvas->SaveAs("AKTjetpair1Mass.png");
      cout <<endl<< "Run gaussian fit for the sub-leading anti-KT jet pair..."<<endl;
-     AKTjetMass2->Fit("jetpair2gausfit","R");
+
+
+     AKTjetMass2->Fit("jetpair2fit","R");
+     jetpair2fit->GetParameters(param);
+     fSignal->SetParameters(&param[0]);
+     fBackground->SetParameters(&param[3]);
+     TH1D *AKTjetMass2Signal = new TH1D(*AKTjetMass2);
+     AKTjetMass2Signal->Sumw2();
+     AKTjetMass2Signal->Add(fBackground,-1);
+     AKTjetMass2->GetXaxis()->SetTitle("M [GeV]");
+     AKTjetMass2->GetYaxis()->SetTitle("Events");
+     AKTjetMass2->Draw();fBackground->SetLineColor(4);fBackground->Draw("SAME"); 
+     //AKTjetMass2Signal->Draw("SAME"); fSignal->Draw("SAME");
      mycanvas->SaveAs("AKTjetpair2Mass.png");
      cout <<endl<< "Run gaussian fit for the sub-leading GenJet pair under selection of AKT..."<<endl;
-     GenAKTMass2->Fit("jetpair2gausfit","R");
-     mycanvas->SaveAs("GenAKTMass2.png");
+     //GenAKTMass2->Fit("jetpair2fit","R");
+     //mycanvas->SaveAs("GenAKTMass2.png");
      cout <<endl<< "Run gaussian fit for the sub-leading GenJet pair (Uncut)..."<<endl;
-     GenUncutMass2->Fit("jetpair2gausfit","R");
-     mycanvas->SaveAs("GenUncutMass2.png");
+     //GenUncutMass2->Fit("jetpair2fit","R");
+     //mycanvas->SaveAs("GenUncutMass2.png");
 
 
-     VLCGenMass2Comp->Draw();
-     mycanvas->SaveAs("VLCGenMass2Comp.png");
-     AKTGenMass2Comp->Draw();
-     mycanvas->SaveAs("AKTGenMass2Comp.png");
+     //VLCGenMass2Comp->Draw();
+     //mycanvas->SaveAs("VLCGenMass2Comp.png");
+     //AKTGenMass2Comp->Draw();
+     //mycanvas->SaveAs("AKTGenMass2Comp.png");
 
      cout <<endl<< "Output in TTree..."<<endl;
 
      VLCR05N4Mass1->Write();
      VLCR05N4Mass2->Write();
-     GenVLCMass2->Write();
-     VLCGenMass2Comp->Write();
+     //GenVLCMass2->Write();
+     //VLCGenMass2Comp->Write();
      AKTjetMass1->Write();
      AKTjetMass2->Write();
-     GenAKTMass2->Write();
-     AKTGenMass2Comp->Write();
-     GenUncutMass2->Write();
+     //GenAKTMass2->Write();
+     //AKTGenMass2Comp->Write();
+     //GenUncutMass2->Write();
 
      tree_output->Write();
 
