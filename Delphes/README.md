@@ -45,7 +45,7 @@ The process will take about 5-60 min, suggest working on vncserver or add follow
 Don't forget to gunzip the .hepmc.tar.gz for preparation for delphes simulation:
 ```bash 
 cd <your output directory>/Events/run_01/
-gunzip tag_1_pythia8_events.hepmc.tar.gz
+gunzip tag_1_pythia8_events.hepmc.gz
 ```
 ## Detector simulation on Delphes
 ### Installation of Delphes
