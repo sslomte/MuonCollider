@@ -1,0 +1,37 @@
+Running Jobs on the Wisconsin Computing Cluster
+
+Start with the files "mucoljob.sh" and "ilcsoft.sh", found in this directory. You may need to revise them for your task.
+
+Log into one the of login nodes: ssh login.hep.wisc.edu
+Set up your files in /nfs_scratch in a directory under your user name. For example, my user name is "cvuosalo",
+so I created my own directory under /nfs_scratch with "mkdir /nfs_scratch/cvuosalo".
+
+Create a job submission directory (any name you choose) and put the scripts "mucoljob.sh" and "ilcsoft.sh" in it.
+
+Create a voms proxy: voms-proxy-init -rfc  -valid 144:00
+
+Submit your jobs to the cluster (change arguments for your needs):
+
+python /usr/local/bin/runWiscJobs.py \
+  --WorkFlow trymucol1 \
+  --Executable=/nfs_scratch/cvuosalo/MuColl/runjobs/mucoljob.sh \
+  --Arguments=10 \
+  --nJobs=2 \
+  --TransferInputFile=/nfs_scratch/cvuosalo/MuColl/runjobs/ilcsoft.sh \
+  --OutputDir=testMuCol \
+  --HDFSProdDir None \
+  --Experiment mucol \
+  --Requirements INFN_CVMFS_Exists
+  
+The "Workflow" argument should be a unique name that changes every time you submit jobs.
+"Executable" should be the full path to your mucoljob.sh script.
+"Arguments" are arguments passed to the mucoljob.sh script, which might not be needed by the script.
+"nJobs" is the number of jobs to run on the cluster.
+"TransferInputFile" should be the full path to your ilcsoft.sh script.
+
+This command will give more information about the arguments to "runWiscJobs.py": python /usr/local/bin/runWiscJobs.py --help
+
+You can check the progress of your jobs with this command: condor_q -nobatch
+
+The logs from your jobs will be written to /nfs/scratch/<your user name>/<Workflow>. In the example submission command above <Workflow> is "trymucol1".
+The output files from simulation and reconstruction will be written to the submission directory as files with names ending in ".out".
