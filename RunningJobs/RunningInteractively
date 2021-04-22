@@ -7,3 +7,5 @@ cd /scratch/`whoami`
 Then follow the instructions here starting with "Test":
 
 https://confluence.infn.it/display/muoncollider/Installation#Installation-Simulation
+
+Note the last step takes a long time for the full display to show.
