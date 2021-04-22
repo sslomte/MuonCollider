@@ -1,0 +1,9 @@
+To run the muon collider simulation interactively, log into mucol01. If you can't log in, email help@hep.wisc.edu and ask for access to mucol01.
+
+ssh mucol01
+mkdir /scratch/`whoami`
+cd /scratch/`whoami`
+
+Then follow the instructions here starting with "Test":
+
+https://confluence.infn.it/display/muoncollider/Installation#Installation-Simulation
