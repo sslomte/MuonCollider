@@ -1,5 +1,10 @@
 Running Jobs on the Wisconsin Computing Cluster
 
+If you don't have a grid certificate and are joining CMS, follow the instructions here:
+https://www.hep.wisc.edu/cms/comp/accountSetup.html#grid_cert
+
+If you don't have a grid certificate and are not joining CMS, you can join the GLOW Virtual Organization. Email help@hep.wisc.edu and ask for instructions.
+
 Start with the files "mucoljob.sh" and "ilcsoft.sh", found in this directory. You may need to revise them for your task.
 
 Log into one the of login nodes: ssh login.hep.wisc.edu
